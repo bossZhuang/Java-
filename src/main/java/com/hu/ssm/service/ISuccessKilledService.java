@@ -1,4 +1,4 @@
-package com.hu.ssm.api;
+package com.hu.ssm.service;
 
 import com.hu.ssm.entity.SuccessKilled;
 

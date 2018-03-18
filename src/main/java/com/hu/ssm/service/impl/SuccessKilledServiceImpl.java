@@ -1,7 +1,7 @@
-package com.hu.ssm.service;
+package com.hu.ssm.service.impl;
 
-import com.hu.ssm.api.ISuccessKilledService;
 import com.hu.ssm.entity.SuccessKilled;
+import com.hu.ssm.service.ISuccessKilledService;
 import org.springframework.stereotype.Service;
 
 /**

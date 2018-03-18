@@ -1,8 +1,11 @@
-package com.hu.ssm.api;
+package com.hu.ssm.service;
 
 import com.hu.ssm.dto.Exposer;
 import com.hu.ssm.dto.SeckillExecution;
 import com.hu.ssm.entity.Seckill;
+import com.hu.ssm.exception.RepeatKillException;
+import com.hu.ssm.exception.SeckillCloseException;
+import com.hu.ssm.exception.SeckillException;
 
 import java.util.Date;
 import java.util.List;
@@ -42,5 +45,6 @@ public interface ISeckillService {
      * @param md5
      * @return
      */
-    SeckillExecution executeSeckill(long seckillId,long userPhone,String md5);
+    SeckillExecution executeSeckill(long seckillId,long userPhone,String md5)
+    throws SeckillException,SeckillCloseException,RepeatKillException;
 }
