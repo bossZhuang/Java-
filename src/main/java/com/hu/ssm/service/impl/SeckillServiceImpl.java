@@ -3,6 +3,7 @@ package com.hu.ssm.service.impl;
 import com.hu.ssm.dto.Exposer;
 import com.hu.ssm.dto.SeckillExecution;
 import com.hu.ssm.entity.Seckill;
+import com.hu.ssm.entity.SuccessKilled;
 import com.hu.ssm.exception.RepeatKillException;
 import com.hu.ssm.exception.SeckillCloseException;
 import com.hu.ssm.exception.SeckillException;
@@ -66,6 +67,37 @@ public class SeckillServiceImpl implements ISeckillService {
     }
 
     public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException, SeckillCloseException, RepeatKillException {
-        return null;
+        if(md5 == null||!getMD5(seckillId).equals(md5)){
+            throw new SeckillException("seckill data rewrite");
+        }
+        //执行秒杀逻辑:减库存+购买记录
+        Date nowDate = new Date();
+        try {
+            //减库存
+            int updateCount = seckilledMapper.reduceNumber(seckillId,nowDate);
+            if (updateCount <= 0){
+                //没有更新记录秒杀结束
+                throw new SeckillCloseException("seckill is closed");
+            } else {
+                //记录购买行为
+                int insertCount = successKilledMapper.insertSuccessKilled(seckillId,userPhone);
+                if (insertCount <= 0){
+                    //重复秒杀
+                    throw new RepeatKillException("seckill repeated");
+                } else {
+                    //秒杀成功
+                    SuccessKilled successKilled = successKilledMapper.queryByIdWithSeckill(seckillId,userPhone);
+                    return new SeckillExecution(seckillId, 1, "秒杀成功" ,successKilled);
+                }
+            }
+        } catch (SeckillCloseException e1) {
+            throw e1;
+        } catch (RepeatKillException e2) {
+            throw e2;
+        } catch (Exception e) {
+            logger.info(e.getMessage(), e);
+            //所有编译期异常转化成运行时异常-有助于Spring声明式事务进行回滚操作
+            throw new SeckillException("seckill inner error:"+e.getMessage());
+        }
     }
 }
