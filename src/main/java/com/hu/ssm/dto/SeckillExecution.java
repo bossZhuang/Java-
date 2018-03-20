@@ -1,6 +1,7 @@
 package com.hu.ssm.dto;
 
 import com.hu.ssm.entity.SuccessKilled;
+import com.hu.ssm.enums.SeckillStatEnum;
 
 /**
  * Created by huz on 2018/3/17.
@@ -16,17 +17,17 @@ public class SeckillExecution {
     //秒杀成功对象
     private SuccessKilled successKilled;
 
-    public SeckillExecution(long seckillId, int status, String statusInfo, SuccessKilled successKilled) {
+    public SeckillExecution(long seckillId, SeckillStatEnum seckillStatEnum, SuccessKilled successKilled) {
         this.seckillId = seckillId;
-        this.status = status;
-        this.statusInfo = statusInfo;
+        this.status = seckillStatEnum.getState();
+        this.statusInfo = seckillStatEnum.getStateinfo();
         this.successKilled = successKilled;
     }
 
-    public SeckillExecution(long seckillId, int status, String statusInfo) {
+    public SeckillExecution(long seckillId, SeckillStatEnum seckillStatEnum, String statusInfo) {
         this.seckillId = seckillId;
-        this.status = status;
-        this.statusInfo = statusInfo;
+        this.status = seckillStatEnum.getState();
+        this.statusInfo = seckillStatEnum.getStateinfo();
     }
 
     public long getSeckillId() {

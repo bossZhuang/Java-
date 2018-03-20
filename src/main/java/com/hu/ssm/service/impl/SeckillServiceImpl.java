@@ -4,6 +4,7 @@ import com.hu.ssm.dto.Exposer;
 import com.hu.ssm.dto.SeckillExecution;
 import com.hu.ssm.entity.Seckill;
 import com.hu.ssm.entity.SuccessKilled;
+import com.hu.ssm.enums.SeckillStatEnum;
 import com.hu.ssm.exception.RepeatKillException;
 import com.hu.ssm.exception.SeckillCloseException;
 import com.hu.ssm.exception.SeckillException;
@@ -87,7 +88,7 @@ public class SeckillServiceImpl implements ISeckillService {
                 } else {
                     //秒杀成功
                     SuccessKilled successKilled = successKilledMapper.queryByIdWithSeckill(seckillId,userPhone);
-                    return new SeckillExecution(seckillId, 1, "秒杀成功" ,successKilled);
+                    return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS ,successKilled);
                 }
             }
         } catch (SeckillCloseException e1) {
