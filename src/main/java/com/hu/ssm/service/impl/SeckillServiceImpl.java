@@ -29,6 +29,7 @@ public class SeckillServiceImpl implements ISeckillService {
 
     private Logger logger = LoggerFactory.getLogger(SeckillServiceImpl.class);
 
+
     private SeckilledMapper seckilledMapper;
 
     private SuccessKilledMapper successKilledMapper;
