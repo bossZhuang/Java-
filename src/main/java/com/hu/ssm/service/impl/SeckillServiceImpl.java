@@ -13,6 +13,7 @@ import com.hu.ssm.mapper.SuccessKilledMapper;
 import com.hu.ssm.service.ISeckillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -29,9 +30,9 @@ public class SeckillServiceImpl implements ISeckillService {
 
     private Logger logger = LoggerFactory.getLogger(SeckillServiceImpl.class);
 
-
+    @Autowired
     private SeckilledMapper seckilledMapper;
-
+    @Autowired
     private SuccessKilledMapper successKilledMapper;
 
     private final String slat = "sdfsdfsdf8979ADSF";
