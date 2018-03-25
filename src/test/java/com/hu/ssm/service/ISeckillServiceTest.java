@@ -1,5 +1,6 @@
 package com.hu.ssm.service;
 
+import com.hu.ssm.entity.Seckill;
 import com.hu.ssm.service.impl.SeckillServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -26,7 +29,8 @@ public class ISeckillServiceTest {
 
     @Test
     public void getSeckillList() throws Exception {
-
+        List<Seckill> seckillList = iSeckillService.getSeckillList();
+        logger.info("list={}",seckillList);
     }
 
     @Test
