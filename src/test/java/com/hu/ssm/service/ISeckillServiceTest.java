@@ -1,5 +1,7 @@
 package com.hu.ssm.service;
 
+import com.hu.ssm.dto.Exposer;
+import com.hu.ssm.dto.SeckillExecution;
 import com.hu.ssm.entity.Seckill;
 import com.hu.ssm.service.impl.SeckillServiceImpl;
 import org.junit.Test;
@@ -40,12 +42,24 @@ public class ISeckillServiceTest {
 
     @Test
     public void exportSeckillUrl() throws Exception {
-
+        long id = 1000;
+        Exposer exportSeckillUrl = iSeckillService.exportSeckillUrl(id);
+        logger.info("exposer={}",exportSeckillUrl);
+        //exposed=true,
+        // md5='c70d673a0e8614a74c1a4a9124801473',
+        // seckillId=1000,
+        // now=0,
+        // start=0,
+        // end=0
     }
 
     @Test
     public void executeSeckill() throws Exception {
-
+        long id = 1000;
+        long phone = 13502181181L;
+        String md5 = "c70d673a0e8614a74c1a4a9124801473";
+        SeckillExecution seckillExecution = iSeckillService.executeSeckill(id,phone,md5);
+        logger.info("result={}",seckillExecution);
     }
 
 }

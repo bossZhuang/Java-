@@ -61,6 +61,7 @@ public class SeckillServiceImpl implements ISeckillService {
         }
         //转化特定字符串的过程，不可逆
         String md5 = getMD5(seckillId);//TODO
+        System.out.println("md5是:"+md5);
         return new Exposer(true,md5,seckillId);
     }
 
