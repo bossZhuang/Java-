@@ -10,6 +10,7 @@ import com.hu.ssm.exception.SeckillCloseException;
 import com.hu.ssm.exception.SeckillException;
 import com.hu.ssm.mapper.SeckilledMapper;
 import com.hu.ssm.mapper.SuccessKilledMapper;
+import com.hu.ssm.mapper.cache.RedisDao;
 import com.hu.ssm.service.ISeckillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ public class SeckillServiceImpl implements ISeckillService {
     private SeckilledMapper seckilledMapper;
     @Autowired
     private SuccessKilledMapper successKilledMapper;
+    @Autowired
+    private RedisDao redisDao;
 
     private final String slat = "sdfsdfsdf8979ADSF";
 
@@ -47,10 +50,20 @@ public class SeckillServiceImpl implements ISeckillService {
     }
 
     public Exposer exportSeckillUrl(long seckillId) {
-        Seckill seckill = getById(seckillId);
-        if(seckill==null){
-            return new Exposer(false,seckillId);
+        //1.优化点缓存优化
+        Seckill  seckill = redisDao.getSeckill(seckillId);
+        if (seckill == null){
+            //访问数据库
+            System.out.println("访问数据库！");
+            seckill = getById(seckillId);
+            if(seckill==null){
+                return new Exposer(false,seckillId);
+            }else {
+                //放到Redis中
+                String result = redisDao.putSeckill(seckill);
+            }
         }
+
         Date startTime = seckill.getStartTime();
         Date endTime = seckill.getEndTime();
         //当前系统时间
@@ -85,23 +98,26 @@ public class SeckillServiceImpl implements ISeckillService {
         //执行秒杀逻辑:减库存+购买记录
         Date nowDate = new Date();
         try {
-            //减库存
-            int updateCount = seckilledMapper.reduceNumber(seckillId,nowDate);
-            if (updateCount <= 0){
-                //没有更新记录秒杀结束
-                throw new SeckillCloseException("seckill is closed");
-            } else {
+
+
                 //记录购买行为
                 int insertCount = successKilledMapper.insertSuccessKilled(seckillId,userPhone);
                 if (insertCount <= 0){
                     //重复秒杀
                     throw new RepeatKillException("seckill repeated");
                 } else {
-                    //秒杀成功
-                    SuccessKilled successKilled = successKilledMapper.queryByIdWithSeckill(seckillId,userPhone);
-                    return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS ,successKilled);
+                    //减库存,热点商品竞争的地方
+                    int updateCount = seckilledMapper.reduceNumber(seckillId,nowDate);
+                    if (updateCount <= 0){
+                        //没有更新记录秒杀结束
+                        throw new SeckillCloseException("seckill is closed");
+                    } else {
+                        //秒杀成功
+                        SuccessKilled successKilled = successKilledMapper.queryByIdWithSeckill(seckillId,userPhone);
+                        return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS ,successKilled);
+                    }
                 }
-            }
+
         } catch (SeckillCloseException e1) {
             throw e1;
         } catch (RepeatKillException e2) {
