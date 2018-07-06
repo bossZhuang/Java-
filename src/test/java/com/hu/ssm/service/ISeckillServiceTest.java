@@ -5,8 +5,6 @@ import com.hu.ssm.dto.SeckillExecution;
 import com.hu.ssm.entity.Seckill;
 import com.hu.ssm.exception.RepeatKillException;
 import com.hu.ssm.exception.SeckillCloseException;
-import com.hu.ssm.exception.SeckillException;
-import com.hu.ssm.service.impl.SeckillServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -16,8 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by huz on 2018/3/24.
@@ -119,6 +115,19 @@ public class ISeckillServiceTest {
          * endTime=Fri Mar 30 00:00:00 CST 2018,
          * createTime=Tue Jan 09 21:22:03 CST 2018}}}
          */
+    }
+
+    @Test
+    public void executeSeckillProcedure(){
+        long seckillId = 1001;
+        long phone = 1366676071;
+        Exposer exposer = iSeckillService.exportSeckillUrl(seckillId);
+         if (exposer.isExposed()){
+             String md5 = exposer.getMd5();
+             SeckillExecution execution = iSeckillService.executeSeckillProcedure(seckillId,phone,md5);
+             logger.info(execution.getStatusInfo());
+         }
+
     }
 
 }

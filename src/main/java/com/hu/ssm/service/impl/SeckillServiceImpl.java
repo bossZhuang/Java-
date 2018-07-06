@@ -12,6 +12,7 @@ import com.hu.ssm.mapper.SeckilledMapper;
 import com.hu.ssm.mapper.SuccessKilledMapper;
 import com.hu.ssm.mapper.cache.RedisDao;
 import com.hu.ssm.service.ISeckillService;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 业务接口：站在"使用者"角度设计接口
@@ -127,5 +130,32 @@ public class SeckillServiceImpl implements ISeckillService {
             //所有编译期异常转化成运行时异常-有助于Spring声明式事务进行回滚操作
             throw new SeckillException("seckill inner error:"+e.getMessage());
         }
+    }
+
+    public SeckillExecution executeSeckillProcedure(long seckillId, long userPhone, String md5) throws SeckillException, SeckillCloseException, RepeatKillException {
+        if(md5 == null||!getMD5(seckillId).equals(md5)){
+            throw new SeckillException("seckill data rewrite");
+        }
+        Date killTime = new Date();
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("seckillId",seckillId);
+        map.put("phone",userPhone);
+        map.put("killTime",killTime);
+        map.put("result",null);
+        //执行存储过程，result被赋值
+        try {
+            seckilledMapper.killByProcedure(map);
+            int result = MapUtils.getInteger(map,"result",-2);
+            if (result==1){
+                SuccessKilled sk = successKilledMapper.queryByIdWithSeckill(seckillId,userPhone);
+                return new SeckillExecution(seckillId,SeckillStatEnum.SUCCESS,sk);
+            }else {
+                return new SeckillExecution(seckillId,SeckillStatEnum.stateOf(result));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

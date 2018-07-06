@@ -4,13 +4,13 @@ DELIMITER $$ -- console;转换为 $$
 -- 参数定义:in 输入参数；out 输出参数
 -- count_count();返回上一条修改类型sql(insert，delete，update)的影响行数
 -- row_count; 0;未修改数据；>0表示修改行数；<0；sql错误/未执行修改SQL
-CREATE PROCEDURE `seckill`.`execute_seckill`(in v_seckill_id bitint,in v_phone bigint,in v_kill_time timestamp,out r_result int)
+CREATE PROCEDURE `seckill`.`execute_seckill`(in v_seckill_id bigint,in v_phone bigint,in v_kill_time timestamp,out r_result int)
   BEGIN
     DECLARE insert_count int default 0;
     START TRANSACTION ;
     INSERT IGNORE INTO success_killed
     (seckill_id,user_phone,create_time)
-        VALUES (v_seckill_id,v_phone,v_kill_time)
+        VALUES (v_seckill_id,v_phone,v_kill_time);
     SELECT row_count() INTO insert_count;
     IF (insert_count = 0) then
       ROLLBACK;
@@ -48,3 +48,9 @@ set @r_result=-3;
 call execute_seckill(1003,13502178891,now(),@r_result);
 -- 获取结果
 SELECT @r_result;
+
+-- 存储过程
+-- 1:存储过程优化:事物行级锁持有的时间
+-- 2:不要过度依赖存储过程，存储过程主要大量用在银行的oracle数据库。
+-- 3:简单的逻辑可以应用存储过程
+-- 4:做到一个秒杀单6000/qps
